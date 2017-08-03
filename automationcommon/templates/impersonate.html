@@ -1,0 +1,18 @@
+<html>
+<head>
+    <title>Impersonate User</title>
+</head>
+<body>
+    <form name="impersonateform" action="/hijack/username/" method="post" onsubmit="chgAction()">
+        {% csrf_token %}
+        <input type="text" name="crsid" title="CRSid to impersonate">
+        <button type="submit">Impersonate</button>
+    </form>
+    <script>
+        function chgAction()
+        {
+            document.impersonateform.action = document.impersonateform.action + document.impersonateform.crsid.value + "/";
+        }
+    </script>
+</body>
+</html>
