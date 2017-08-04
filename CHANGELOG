@@ -1,6 +1,12 @@
 django-automationcommon changelog
 =================================
 
+1.2 - 04/08/2017
+------------------
+
+- Added /static to manifest
+
+
 1.1 - 04/08/2017
 ------------------
 
