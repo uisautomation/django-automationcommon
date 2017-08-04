@@ -1,6 +1,12 @@
 django-automationcommon changelog
 =================================
 
+1.1 - 04/08/2017
+------------------
+
+- Support for pidashboard
+
+
 1.0 - 03/08/2017
 ----------------
 

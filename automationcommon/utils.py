@@ -1,4 +1,8 @@
 import logging
+
+import re
+
+import datetime
 from celery import Task
 from celery import shared_task
 from django.conf import settings
@@ -190,3 +194,13 @@ def merge_dicts(dict1, dict2):
     merged = dict1.copy()
     merged.update(dict2)
     return merged
+
+
+def json_date_parser(json_dict):
+    for k, v in json_dict.items():
+        if isinstance(v, str) and re.search("DATE", k):
+            try:
+                json_dict[k] = datetime.datetime.strptime(v, "%Y-%m-%dT%H:%M:%S").date()
+            except:
+                pass
+    return json_dict

@@ -28,3 +28,13 @@ def unique_entity_id(entity):
     :return: unique token combining the model type and id for use in HTML
     """
     return "%s-%s" % (type(entity).__name__, entity.id)
+
+
+@register.filter
+def get_item(dictionary, key):
+    """
+    :param dictionary: the dictionary where you want to access the data from
+    :param key: the key of the dictionary where you want to access the data from
+    :return: the content of the dictionary corresponding to the key entry or None if the key does not exists
+    """
+    return dictionary.get(key, None)
