@@ -15,7 +15,7 @@ setup(
     long_description=open('README.rst').read(),
     url='https://git.csx.cam.ac.uk/i/ucs/automation/django-automationcommon',
     author='Automation team, University Information Services, University of Cambridge',
-    author_email='amc203@cam.ac.uk',
+    author_email='automation@uis.cam.ac.uk',
     install_requires=[
         'django>=1.8,<1.12',
         'django-ucamlookup>=1.9.2',
