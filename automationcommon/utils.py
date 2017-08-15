@@ -22,6 +22,13 @@ from ucamlookup import createConnection, PersonMethods
 LOGGER = logging.getLogger('common')
 
 
+class ApplicationError(Exception):
+    """
+    This class is intended as a base class for all application errors.
+    """
+    pass
+
+
 def get_users_email_address_from_lookup(user, email_only=False):
     """
     This function look's up an email address for a user. If one cannot be found it returns a default
@@ -197,10 +204,34 @@ def merge_dicts(dict1, dict2):
 
 
 def json_date_parser(json_dict):
+    """
+    Used to convert dates when de-serialising JSON. Looks for keys containing the string "DATE" and tries to convert
+    their value to a datetime.
+
+    Usage: json.loads(x, object_hook=json_date_parser)
+
+    :param json_dict: dict loaded from JSON.
+    :return: json_dict
+    """
     for k, v in json_dict.items():
         if isinstance(v, str) and re.search("DATE", k):
             try:
-                json_dict[k] = datetime.datetime.strptime(v, "%Y-%m-%dT%H:%M:%S").date()
-            except:
+                json_dict[k] = datetime.datetime.strptime(v, "%Y-%m-%dT%H:%M:%S")
+            except ValueError:
                 pass
     return json_dict
+
+
+def json_date_formatter(obj):
+    """
+    Used to format datetimes when serialising JSON.
+
+    Usage: json.dumps(x, default=json_date_formatter)
+
+    :param obj: object to serialise
+    :return: serialised object
+    """
+    if hasattr(obj, 'isoformat'):
+        return obj.isoformat()
+    else:
+        raise TypeError
