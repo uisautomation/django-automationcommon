@@ -40,7 +40,7 @@ def status(request):
                 status_results[name] = response.status_code == 200
             except Exception as e:
                 status_results[name] = False
-                overall_result = overall_result and status_results[name]
+            overall_result = overall_result and status_results[name]
 
     if not overall_result:
         LOGGER.error("Status Webpage returning 500: %s" % status_results)
