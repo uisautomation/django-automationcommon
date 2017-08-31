@@ -1,6 +1,11 @@
 django-automationcommon changelog
 =================================
 
+1.5 - 31/08/2017
+----------------
+
+- Added custom_filters.parse_date
+
 1.4 - 16/08/2017
 ----------------
 

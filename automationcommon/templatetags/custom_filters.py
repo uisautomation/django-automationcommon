@@ -1,3 +1,4 @@
+import dateutil
 from django import template
 
 register = template.Library()
@@ -38,3 +39,12 @@ def get_item(dictionary, key):
     :return: the content of the dictionary corresponding to the key entry or None if the key does not exists
     """
     return dictionary.get(key, None)
+
+
+@register.filter
+def parse_date(date_str):
+    """
+    :param date_str: a string representation of a date
+    :return: the parsed date
+    """
+    return dateutil.parser.parse(date_str) if date_str else None
