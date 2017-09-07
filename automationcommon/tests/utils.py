@@ -101,10 +101,19 @@ class UnitTestCase(TestCase):
                 return
         self.fail("Couldn't find element '%s' with text '%s'" % (element, text))
 
-    def patch(self, target_name):
+    def patch(self, target_name, side_effect=None):
+        """
+        Patching helper method
+
+        :param target_name: name of target method to patch
+        :param side_effect: optional side_effect to set
+        :return: the patched target method
+        """
         patcher = patch(target_name)
         target = patcher.start()
         self.addCleanup(patcher.stop)
+        if side_effect:
+            target.side_effect = side_effect
         return target
 
 
