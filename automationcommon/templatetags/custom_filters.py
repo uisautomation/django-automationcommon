@@ -48,7 +48,6 @@ def parse_date(date_str, ignore_timezone=False):
     :param ignore_timezone: if the timezone in the date_str should be ignored
     :return: the parsed date
     """
-    parsed_date = dateutil.parser.parse(date_str) if date_str else None
-    if ignore_timezone:
-        parsed_date = parsed_date.replace(tzinfo=None)
-    return parsed_date
+    if not date_str:
+        return None
+    return dateutil.parser.parse(date_str).replace(tzinfo=None) if ignore_timezone else dateutil.parser.parse(date_str)
