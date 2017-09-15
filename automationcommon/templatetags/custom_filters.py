@@ -42,9 +42,13 @@ def get_item(dictionary, key):
 
 
 @register.filter
-def parse_date(date_str):
+def parse_date(date_str, ignore_timezone=False):
     """
     :param date_str: a string representation of a date
+    :param ignore_timezone: if the timezone in the date_str should be ignored
     :return: the parsed date
     """
-    return dateutil.parser.parse(date_str) if date_str else None
+    parsed_date = dateutil.parser.parse(date_str) if date_str else None
+    if ignore_timezone:
+        parsed_date = parsed_date.replace(tzinfo=None)
+    return parsed_date
