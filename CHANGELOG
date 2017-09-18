@@ -1,6 +1,13 @@
 django-automationcommon changelog
 =================================
 
+1.8 - 18/09/2017
+----------------
+
+- included missing status.html template
+- status page can now be configured to test soap endpoints
+
+
 1.7.1 - 15/09/2017
 ----------------
 

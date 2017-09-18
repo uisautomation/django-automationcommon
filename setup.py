@@ -7,7 +7,7 @@ from setuptools import find_packages
 setup(
     name='django-automationcommon',
     # When changing this version number, remember to update CHANGELOG.
-    version='1.7.1',
+    version='1.8',
     packages=find_packages(),
     include_package_data=True,
     license='MIT',
@@ -21,7 +21,8 @@ setup(
         'django-ucamlookup>=1.9.2',
         'requests',
         'celery<4',
-        'python-dateutil'
+        'python-dateutil',
+        'zeep'
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',

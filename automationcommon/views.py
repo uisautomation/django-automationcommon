@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 from django.shortcuts import render
-
+from zeep import Client
 
 LOGGER = logging.getLogger('common')
 
@@ -34,10 +34,18 @@ def status(request):
     overall_result = status_results['Database']
 
     if hasattr(settings, 'SERVICE_CHECKS'):
-        for name, url in settings.SERVICE_CHECKS.items():
+        for name, service in settings.SERVICE_CHECKS.items():
             try:
-                response = requests.get(url)
-                status_results[name] = response.status_code == 200
+                if isinstance(service, str):
+                    # treat as REST endpoint
+                    response = requests.get(service)
+                    status_results[name] = response.status_code == 200
+                else:
+                    # assume soap descriptor
+                    client = Client(service['url'])
+                    proxy = client.bind(service_name=service['name'], port_name=service['name'] + 'Soap12')
+                    proxy[service['operation']]()
+                    status_results[name] = True
             except Exception as e:
                 status_results[name] = False
             overall_result = overall_result and status_results[name]
