@@ -1,6 +1,12 @@
 django-automationcommon changelog
 =================================
 
+1.9 - 27/09/2017
+----------------
+
+- configured to log to 'automationcommon'
+
+
 1.8 - 18/09/2017
 ----------------
 

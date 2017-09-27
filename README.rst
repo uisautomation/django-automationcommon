@@ -20,3 +20,4 @@ Quick start
 
 3. Run `python manage.py migrate` to create the automationcommon models.
 
+4. All module logging writes to a logger named 'automationcommon'

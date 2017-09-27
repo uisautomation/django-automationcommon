@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render
 from zeep import Client
 
-LOGGER = logging.getLogger('common')
+LOGGER = logging.getLogger('automationcommon')
 
 
 @user_passes_test(lambda user: user.is_superuser)

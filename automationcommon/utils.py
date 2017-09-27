@@ -19,7 +19,7 @@ from django.views.generic import TemplateView
 from ucamlookup import createConnection, PersonMethods
 
 
-LOGGER = logging.getLogger('common')
+LOGGER = logging.getLogger('automationcommon')
 
 
 class ApplicationError(Exception):
