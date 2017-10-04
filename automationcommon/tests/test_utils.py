@@ -17,7 +17,7 @@ class UtilsTests(TestCase):
         self.createConnection = utils.createConnection
         utils.createConnection = Mock(side_effect=create_connection_fake)
 
-        self.PersonMethods_search = utils.PersonMethods.search
+        self.PersonMethods_getPerson = utils.PersonMethods.getPerson
 
     def test_get_users_email_address_from_lookup(self):
 
@@ -27,7 +27,7 @@ class UtilsTests(TestCase):
 
         # setup user where lookup fails
         user_none = User(username='jfk1000', last_name="John F Kennedy")
-        utils.PersonMethods.search = MagicMock(return_value=None)
+        utils.PersonMethods.getPerson = MagicMock(return_value=None)
 
         # test for full address
         result = utils.get_users_email_address_from_lookup(user_none)
@@ -39,7 +39,7 @@ class UtilsTests(TestCase):
 
         # setup user where lookup success
         user_found = User(username='fsf1000', last_name="F Scott Fitzgerald")
-        utils.PersonMethods.search = MagicMock(return_value=[Attributes(attributes=[Value(value="fsf1001@cam.ac.uk")])])
+        utils.PersonMethods.getPerson = MagicMock(return_value=Attributes(attributes=[Value(value="fsf1001@cam.ac.uk")]))
 
         # test for full address
         result = utils.get_users_email_address_from_lookup(user_found)
@@ -65,4 +65,4 @@ class UtilsTests(TestCase):
 
     def tearDown(self):
         utils.createConnection = self.createConnection
-        utils.PersonMethods.search = self.PersonMethods_search
+        utils.PersonMethods.getPerson = self.PersonMethods_getPerson

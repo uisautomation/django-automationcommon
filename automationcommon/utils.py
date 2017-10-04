@@ -1,8 +1,6 @@
-import logging
-
-import re
-
 import datetime
+import logging
+import re
 from celery import Task
 from celery import shared_task
 from django.conf import settings
@@ -39,23 +37,23 @@ def get_users_email_address_from_lookup(user, email_only=False):
     :return: looked up user email of default
     """
     conn = createConnection()
-    results = PersonMethods(conn).search(query=user.username, fetch="email")
+    result = PersonMethods(conn).getPerson(scheme="crsid", identifier=user.username, fetch="email")
     if user.get_full_name() and not email_only:
         default = "%s <%s@cam.ac.uk>" % (user.get_full_name(), user.username)
     else:
         default = "%s@cam.ac.uk" % user.username
-    if results is None or len(results) == 0:
+    if result is None:
         LOGGER.info("no results returned from email lookup - defaulting to '%s'" % default)
         return default
-    if results[0].attributes is None or len(results[0].attributes) == 0:
+    if result.attributes is None or len(result.attributes) == 0:
         LOGGER.warning("no attributes returned from email lookup - defaulting to '%s'" % default)
         return default
-    if '@' not in results[0].attributes[0].value:
-        LOGGER.warning("'%s' is not an email address - defaulting to '%s'" % (results[0].attributes[0].value, default))
+    if '@' not in result.attributes[0].value:
+        LOGGER.warning("'%s' is not an email address - defaulting to '%s'" % (result.attributes[0].value, default))
         return default
     if user.get_full_name() and not email_only:
-        return "%s <%s>" % (user.get_full_name(), results[0].attributes[0].value)
-    return results[0].attributes[0].value
+        return "%s <%s>" % (user.get_full_name(), result.attributes[0].value)
+    return result.attributes[0].value
 
 
 class TaskWithFailure(Task):
