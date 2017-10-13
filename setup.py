@@ -7,7 +7,7 @@ from setuptools import find_packages
 setup(
     name='django-automationcommon',
     # When changing this version number, remember to update CHANGELOG.
-    version='1.10',
+    version='1.10.1',
     packages=find_packages(),
     include_package_data=True,
     license='MIT',
@@ -22,7 +22,8 @@ setup(
         'requests',
         'celery<4',
         'python-dateutil',
-        'zeep'
+        'zeep',
+        'django-hijack'
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
