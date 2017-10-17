@@ -14,6 +14,7 @@ from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
+from stronghold.decorators import public
 from ucamlookup import createConnection, PersonMethods
 
 
@@ -76,6 +77,17 @@ class ProtectedView(TemplateView):
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(ProtectedView, self).dispatch(*args, **kwargs)
+
+
+class PublicView(TemplateView):
+    """
+    A abstract TemplateView to extend from that is stronghold public.
+    """
+    abstract = True
+
+    @method_decorator(public)
+    def dispatch(self, *args, **kwargs):
+        return super(PublicView, self).dispatch(*args, **kwargs)
 
 
 @shared_task(base=TaskWithFailure)
