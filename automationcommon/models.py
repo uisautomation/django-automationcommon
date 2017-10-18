@@ -1,5 +1,12 @@
+import logging
+
 from django.contrib.auth.models import User
 from django.db import models
+from django.forms import model_to_dict
+
+from automationcommon.middleware import get_request_user
+
+LOGGER = logging.getLogger('automationcommon')
 
 
 class Creatable(models.Model):
@@ -14,3 +21,99 @@ class Creatable(models.Model):
 
     class Meta:
         abstract = True
+
+
+class Audit(models.Model):
+    """
+    A model that defines an audit record for a change to any django model
+
+    Attributes:
+        when      when the change was made
+        who       who made the change
+        model     the changed model name
+        model_pk  the changed model primary key
+        field     the changed model's field (if null, then the model has been deleted)
+        old       the changed field's original value
+        new       the changed field's updated value
+    """
+    when = models.DateTimeField(auto_now=True)
+
+    who = models.ForeignKey(User)
+
+    model = models.CharField(max_length=64)
+
+    model_pk = models.IntegerField()
+
+    field = models.CharField(max_length=64, null=True, blank=True)
+
+    old = models.CharField(max_length=255, null=True, blank=True)
+
+    new = models.CharField(max_length=255, null=True, blank=True)
+
+
+class ModelChangeMixin(object):
+    """
+    A model mixin that tracks changes to model fields' values and saves an Audit record per changed field
+    when the model is saved. Based ModelDiffMixin on here:
+    https://stackoverflow.com/questions/1355150/django-when-saving-how-can-you-check-if-a-field-has-changed
+    """
+    def __init__(self, *args, **kwargs):
+        super(ModelChangeMixin, self).__init__(*args, **kwargs)
+        self.__initial = self._dict
+
+    @property
+    def _dict(self):
+        """
+        :return: a dict of the model's fields and their current values
+        """
+        return model_to_dict(self, fields=[field.name for field in self._meta.fields])
+
+    @property
+    def diffs(self):
+        """
+        :return: An array of any changed fields. Each item is a sequence: (field_name, (original_value, updated_value))
+        """
+        d1 = self.__initial
+        d2 = self._dict
+        return [(k, (v, d2[k])) for k, v in d1.items() if v != d2[k]]
+
+    def save(self, *args, **kwargs):
+        """
+        Saves model, create an Audit record per changed field, and resets the initial state.
+        """
+        creating = self.pk is None
+        super(ModelChangeMixin, self).save(*args, **kwargs)
+        # Don't audit new records
+        if not creating:
+            request_user = get_request_user()
+            for diff in self.diffs:
+                if request_user:
+                    Audit.objects.create(
+                        who=get_request_user(),
+                        model=self.__class__.__name__,
+                        model_pk=self.pk,
+                        field=diff[0],
+                        old=diff[1][0],
+                        new=diff[1][1]
+                    )
+                else:
+                    # TODO another option would be to create Audit with who=None
+                    LOGGER.warning("Don't know who made this change: (model=%s:%s, field=%s, old='%s', new='%s')" % (
+                        self.__class__.__name__, self.pk, diff[0], diff[1][0], diff[1][1]
+                    ))
+
+        self.__initial = self._dict
+
+    def delete(self, *args, **kwargs):
+        """
+        FIXME
+        """
+        request_user = get_request_user()
+        if request_user:
+            # TODO
+            # this only records that an object was deleted - to know what it's state was
+            # you could create an Audit record for each field and record it's value in 'old'
+            Audit.objects.create(who=get_request_user(), model=self.__class__.__name__, model_pk=self.pk)
+        else:
+            LOGGER.warning("Don't know deleted this: (model=%s:%s)" % (self.__class__.__name__, self.pk))
+        super(ModelChangeMixin, self).delete(*args, **kwargs)

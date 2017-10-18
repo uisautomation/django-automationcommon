@@ -1,6 +1,12 @@
 django-automationcommon changelog
 =================================
 
+1.12 - 18/10/2017
+-----------------
+
+- models.Audit class works in conjunction with models.ModelChangeMixin and middleware.RequestUserMiddleware to track changes to models.
+
+
 1.11 - 17/10/2017
 -----------------
 
