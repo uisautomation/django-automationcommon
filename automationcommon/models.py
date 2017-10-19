@@ -8,7 +8,7 @@ from django.forms import model_to_dict
 LOGGER = logging.getLogger('automationcommon')
 
 LOCAL_USER_WARNING = """
-    Use automationcommon.models.set_local_user to set the user to be used in the audit trail or 
+    Use automationcommon.models.set_local_user() to set the user to be used in the audit trail or 
     automationcommon.middleware.RequestUserMiddleware if you are in the context of a webapp.
 """
 
