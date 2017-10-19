@@ -1,12 +1,16 @@
 import logging
+import threading
 
 from django.contrib.auth.models import User
 from django.db import models
 from django.forms import model_to_dict
 
-from automationcommon.middleware import get_request_user
-
 LOGGER = logging.getLogger('automationcommon')
+
+LOCAL_USER_WARNING = """
+    Use automationcommon.models.set_local_user to set the user to be used in the audit trail or 
+    automationcommon.middleware.RequestUserMiddleware if you are in the context of a webapp.
+"""
 
 
 class Creatable(models.Model):
@@ -51,6 +55,33 @@ class Audit(models.Model):
     new = models.CharField(max_length=255, null=True, blank=True)
 
 
+# A thread local object used for binding the user currenting updating the model to the thread.
+_thread_local = threading.local()
+
+
+def set_local_user(user):
+    """
+    Bind's a user to the current thread to be used for the audit trail
+
+    :param user: user model
+    """
+    _thread_local.user = user
+
+
+def get_local_user():
+    """
+    :return: The user for the local thread's request
+    """
+    return _thread_local.user if hasattr(_thread_local, 'user') else None
+
+
+def clear_local_user():
+    """
+    Clear's the user from the current thread
+    """
+    _thread_local.user = None
+
+
 class ModelChangeMixin(object):
     """
     A model mixin that tracks changes to model fields' values and saves an Audit record per changed field
@@ -79,41 +110,47 @@ class ModelChangeMixin(object):
 
     def save(self, *args, **kwargs):
         """
-        Saves model, create an Audit record per changed field, and resets the initial state.
+        Saves model, created an Audit record per changed field, and resets the initial state.
         """
         creating = self.pk is None
         super(ModelChangeMixin, self).save(*args, **kwargs)
         # Don't audit new records
         if not creating:
-            request_user = get_request_user()
+            request_user = get_local_user()
             for diff in self.diffs:
                 if request_user:
                     Audit.objects.create(
-                        who=get_request_user(),
+                        who=get_local_user(),
                         model=self.__class__.__name__,
                         model_pk=self.pk,
                         field=diff[0],
-                        old=diff[1][0],
-                        new=diff[1][1]
+                        old=diff[1][0], new=diff[1][1]
                     )
                 else:
                     # TODO another option would be to create Audit with who=None
                     LOGGER.warning("Don't know who made this change: (model=%s:%s, field=%s, old='%s', new='%s')" % (
                         self.__class__.__name__, self.pk, diff[0], diff[1][0], diff[1][1]
                     ))
+                    LOGGER.warning(LOCAL_USER_WARNING)
 
         self.__initial = self._dict
 
     def delete(self, *args, **kwargs):
         """
-        FIXME
+        Created an Audit record per field with 'new' set to None and deletes the model.
         """
-        request_user = get_request_user()
+        request_user = get_local_user()
         if request_user:
-            # TODO
-            # this only records that an object was deleted - to know what it's state was
-            # you could create an Audit record for each field and record it's value in 'old'
-            Audit.objects.create(who=get_request_user(), model=self.__class__.__name__, model_pk=self.pk)
+            for field, value in self.__initial.items():
+                if field != 'id' and value:
+                    Audit.objects.create(
+                        who=get_local_user(),
+                        model=self.__class__.__name__,
+                        model_pk=self.pk,
+                        field=field, old=value,
+                    )
         else:
+            # TODO another option would be to create Audit with who=None
             LOGGER.warning("Don't know deleted this: (model=%s:%s)" % (self.__class__.__name__, self.pk))
+            LOGGER.warning(LOCAL_USER_WARNING)
         super(ModelChangeMixin, self).delete(*args, **kwargs)

@@ -1,7 +1,4 @@
-import threading
-
-# a thread local object used for binding the django request.user to the thread
-thread_local = threading.local()
+from automationcommon.models import clear_local_user, set_local_user
 
 
 class RequestUserMiddleware(object):
@@ -9,13 +6,9 @@ class RequestUserMiddleware(object):
     @classmethod
     def process_request(cls, request):
         """
-        Middleware that simply bind the request.user to the request's thread.
+        Middleware that simply set's the request.user to be used for the audit trail.
         """
-        thread_local.request_user = None if request.user.is_anonymous() else request.user
-
-
-def get_request_user():
-    """
-    :return: The user for the local thread's request
-    """
-    return thread_local.request_user if hasattr(thread_local, 'request_user') else None
+        if request.user.is_anonymous():
+            clear_local_user()
+        else:
+            set_local_user(request.user)
