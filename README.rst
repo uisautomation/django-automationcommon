@@ -7,6 +7,8 @@ Automation Common is a simple Django app that provides common functionality acro
 Quick start
 -----------
 
+testfixtures
+
 1. Add "automationcommon" to your INSTALLED_APPS setting like this::
 
     INSTALLED_APPS = [
@@ -22,8 +24,11 @@ Quick start
 
 4. All module logging writes to a logger named 'automationcommon'
 
-5. This module has an audit trail feature that allows you to capture update to / deletes of selected models.
-   To track changes to a model simple use the ModelChangeMixin.
+5. The unittests can be run using the runtests.py scripts. Please note that the tests require testfixtures in addition
+   to the requirements defined in setup.py.
+
+6. This module has an audit trail feature that allows you to capture update to / deletes of selected models.
+   To track changes to a model simple use the ModelChangeMixin (preceding models.Model).
    To capture the "editor" use automationcommon.models.set_local_user() to set the user to be used in the audit trail
    or configure your app like this::
 

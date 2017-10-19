@@ -4,6 +4,8 @@ from distutils.core import setup
 
 from setuptools import find_packages
 
+# NOTE the testfixtures package is also required to run the tests
+
 setup(
     name='django-automationcommon',
     # When changing this version number, remember to update CHANGELOG.
