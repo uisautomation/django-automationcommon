@@ -4,8 +4,6 @@ from distutils.core import setup
 
 from setuptools import find_packages
 
-# NOTE the testfixtures package is also required to run the tests
-
 setup(
     name='django-automationcommon',
     # When changing this version number, remember to update CHANGELOG.
@@ -18,6 +16,7 @@ setup(
     url='https://git.csx.cam.ac.uk/i/ucs/automation/django-automationcommon',
     author='Automation team, University Information Services, University of Cambridge',
     author_email='automation@uis.cam.ac.uk',
+    tests_require=['testfixtures'],
     install_requires=[
         'django>=1.8,<1.12',
         'django-ucamlookup>=1.9.2',

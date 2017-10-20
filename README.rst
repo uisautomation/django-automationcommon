@@ -24,8 +24,7 @@ testfixtures
 
 4. All module logging writes to a logger named 'automationcommon'
 
-5. The unittests can be run using the runtests.py scripts. Please note that the tests require testfixtures in addition
-   to the requirements defined in setup.py.
+5. The unittests can be run using the runtests.py script.
 
 6. This module has an audit trail feature that allows you to capture update to / deletes of selected models.
    To track changes to a model simple use the ModelChangeMixin (preceding models.Model).
@@ -35,4 +34,5 @@ testfixtures
     MIDDLEWARE_CLASSES = (
         ...
         'automationcommon.middleware.RequestUserMiddleware',
+        ...
     )

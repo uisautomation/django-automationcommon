@@ -33,22 +33,22 @@ class Audit(models.Model):
 
     Attributes:
         when      when the change was made
-        who       who made the change
+        who       who made the change (if null, then the user was anomymous)
         model     the changed model name
         model_pk  the changed model primary key
-        field     the changed model's field (if null, then the model has been deleted)
+        field     the changed model's field
         old       the changed field's original value
         new       the changed field's updated value
     """
     when = models.DateTimeField(auto_now=True)
 
-    who = models.ForeignKey(User)
+    who = models.ForeignKey(User, null=True, blank=True)
 
     model = models.CharField(max_length=64)
 
     model_pk = models.IntegerField()
 
-    field = models.CharField(max_length=64, null=True, blank=True)
+    field = models.CharField(max_length=64)
 
     old = models.CharField(max_length=255, null=True, blank=True)
 
@@ -97,6 +97,7 @@ class ModelChangeMixin(object):
         """
         :return: a dict of the model's fields and their current values
         """
+        # NOTE: an internal attribute has been used when introspecting the model.
         return model_to_dict(self, fields=[field.name for field in self._meta.fields])
 
     @property
@@ -120,14 +121,13 @@ class ModelChangeMixin(object):
             for diff in self.diffs:
                 if request_user:
                     Audit.objects.create(
-                        who=get_local_user(),
+                        who=None if request_user.is_anonymous() else request_user,
                         model=self.__class__.__name__,
                         model_pk=self.pk,
                         field=diff[0],
                         old=diff[1][0], new=diff[1][1]
                     )
                 else:
-                    # TODO another option would be to create Audit with who=None
                     LOGGER.warning("Don't know who made this change: (model=%s:%s, field=%s, old='%s', new='%s')" % (
                         self.__class__.__name__, self.pk, diff[0], diff[1][0], diff[1][1]
                     ))
@@ -144,13 +144,12 @@ class ModelChangeMixin(object):
             for field, value in self.__initial.items():
                 if field != 'id' and value:
                     Audit.objects.create(
-                        who=get_local_user(),
+                        who=None if request_user.is_anonymous() else request_user,
                         model=self.__class__.__name__,
                         model_pk=self.pk,
                         field=field, old=value,
                     )
         else:
-            # TODO another option would be to create Audit with who=None
             LOGGER.warning("Don't know deleted this: (model=%s:%s)" % (self.__class__.__name__, self.pk))
             LOGGER.warning(LOCAL_USER_WARNING)
         super(ModelChangeMixin, self).delete(*args, **kwargs)

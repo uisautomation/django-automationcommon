@@ -15,14 +15,14 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Audit',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', auto_created=True, primary_key=True, serialize=False)),
+                ('id', models.AutoField(primary_key=True, verbose_name='ID', serialize=False, auto_created=True)),
                 ('when', models.DateTimeField(auto_now=True)),
                 ('model', models.CharField(max_length=64)),
                 ('model_pk', models.IntegerField()),
-                ('field', models.CharField(max_length=64, null=True, blank=True)),
-                ('old', models.CharField(max_length=255, null=True, blank=True)),
-                ('new', models.CharField(max_length=255, null=True, blank=True)),
-                ('who', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('field', models.CharField(max_length=64)),
+                ('old', models.CharField(blank=True, max_length=255, null=True)),
+                ('new', models.CharField(blank=True, max_length=255, null=True)),
+                ('who', models.ForeignKey(blank=True, to=settings.AUTH_USER_MODEL, null=True)),
             ],
         ),
     ]

@@ -1,7 +1,7 @@
 import datetime
 import logging
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from testfixtures import LogCapture
 
 from automationcommon.models import set_local_user, Audit, ModelChangeMixin, clear_local_user, LOCAL_USER_WARNING
@@ -20,33 +20,37 @@ class FakeModel:
 
 class TestModel(ModelChangeMixin, FakeModel):
 
-    fields = {
-        'name': 'the round window',
-        'description': "it's round",
-    }
+    def __init__(self, *args, **kwargs):
+        self.fields = {
+            'name': 'the round window',
+            'description': "it's round",
+        }
+        super(TestModel, self).__init__(*args, **kwargs)
 
     @property
     def _dict(self):
-        return self.fields
+        return self.fields.copy()
 
 
 class ModelsTests(UnitTestCase):
 
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create(username="it123")
+
     def setUp(self):
-        self.start = datetime.datetime.now()
-        self.user = User.objects.create(username="it123")
+        set_local_user(self.user)
+        self.test_model = TestModel()
 
     def test_audit_no_user(self):
 
-        mixin = TestModel()
+        clear_local_user()
 
-        # test
         with LogCapture(level=logging.INFO) as log_capture:
-            mixin.fields = {
-                'name': 'the round window',
-                'description': "it's a round window",
-            }
-            mixin.save()
+
+            # test
+            self.test_model.fields.update({'description': "it's a round window"})
+            self.test_model.save()
 
             # check
             self.assertEqual(0, Audit.objects.count())
@@ -60,21 +64,16 @@ class ModelsTests(UnitTestCase):
 
     def test_audit_single_change(self):
 
-        set_local_user(self.user)
-        mixin = TestModel()
+        start = datetime.datetime.now()
 
         # test
-        mixin.fields = {
-            'name': 'the round window',
-            'description': "it's a round window",
-        }
-        mixin.save()
+        self.test_model.fields.update({'description': "it's a round window"})
+        self.test_model.save()
 
         # check
         self.assertEqual(1, Audit.objects.count())
         audit = Audit.objects.all().first()
-        self.assertEqual(1, Audit.objects.count())
-        self.assertLessEqual(self.start, audit.when)
+        self.assertLessEqual(start, audit.when)
         self.assertEqual(self.user, audit.who)
         self.assertEqual('TestModel', audit.model)
         self.assertEqual(1, audit.model_pk)
@@ -82,17 +81,26 @@ class ModelsTests(UnitTestCase):
         self.assertEqual("it's round", audit.old)
         self.assertEqual("it's a round window", audit.new)
 
-    def test_audit_multiple_change(self):
+    def test_audit_anonymous_user(self):
 
-        set_local_user(self.user)
-        mixin = TestModel()
+        set_local_user(AnonymousUser())
 
         # test
-        mixin.fields = {
+        self.test_model.fields.update({'description': "it's a round window"})
+        self.test_model.save()
+
+        # check
+        self.assertEqual(1, Audit.objects.count())
+        self.assertIsNone(Audit.objects.all().first().who)
+
+    def test_audit_multiple_change(self):
+
+        # test
+        self.test_model.fields = {
             'name': 'the square window',
             'description': "no wait, it's actually square!",
         }
-        mixin.save()
+        self.test_model.save()
 
         # check
         self.assertEqual(2, Audit.objects.count())
@@ -106,9 +114,8 @@ class ModelsTests(UnitTestCase):
 
     def test_audit_delete(self):
 
-        set_local_user(self.user)
-        mixin = TestModel()
-        mixin.delete()
+        # test
+        self.test_model.delete()
 
         # check
         self.assertEqual(2, Audit.objects.count())
