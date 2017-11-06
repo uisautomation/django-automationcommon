@@ -1,3 +1,4 @@
+import datetime
 import dateutil
 from django import template
 
@@ -51,3 +52,21 @@ def parse_date(date_str, ignore_timezone=False):
     if not date_str:
         return None
     return dateutil.parser.parse(date_str).replace(tzinfo=None) if ignore_timezone else dateutil.parser.parse(date_str)
+
+
+@register.filter
+def daysuntil_timedelta(d, today=None):
+    """
+    Version of default "timeuntil" filter which a) only takes dates and b)
+    returns a timedelta rather than a formatted string.
+
+    """
+    if not isinstance(d, datetime.date):
+        d = datetime.date(d.year, d.month, d.day)
+    if today and not isinstance(today, datetime.date):
+        today = datetime.date(today.year, today.month, today.day)
+
+    if today is None:
+        today = datetime.date.today()
+
+    return d - today
