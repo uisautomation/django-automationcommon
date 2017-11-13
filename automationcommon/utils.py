@@ -1,8 +1,6 @@
 import datetime
-import django
 import logging
 import re
-from distutils.version import StrictVersion
 from celery import Task
 from celery import shared_task
 from django.conf import settings
@@ -159,8 +157,10 @@ def send(recipients, email_template, context, attachments=None, reply_to=None, b
     :return: the sent EmailMessage
     """
     template = get_template('email/' + email_template + '.txt')
-    context_render = context if StrictVersion(django.get_version()) >= StrictVersion('1.9') else Context(context)
-    subject_and_body = template.render(context_render).split('\n', 1)
+    try:
+        subject_and_body = template.render(Context(context)).split('\n', 1)
+    except:
+        subject_and_body = template.render(context).split('\n', 1)
     if isinstance(recipients, str) or isinstance(recipients, User):
         recipients = [recipients]
 
@@ -188,8 +188,10 @@ def send(recipients, email_template, context, attachments=None, reply_to=None, b
 
     try:
         template = get_template('email/' + email_template + '.html')
-        context_render = context if StrictVersion(django.get_version()) >= StrictVersion('1.9') else Context(context)
-        message.attach_alternative(template.render(context_render), "text/html")
+        try:
+            message.attach_alternative(template.render(Context(context)), "text/html")
+        except:
+            message.attach_alternative(template.render(context), "text/html")
     except TemplateDoesNotExist:
         pass
 
