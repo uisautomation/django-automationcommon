@@ -1,7 +1,7 @@
 import logging
 import threading
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.db import models
 from django.forms import model_to_dict
 
@@ -55,7 +55,9 @@ class Audit(models.Model):
     new = models.CharField(max_length=255, null=True, blank=True)
 
 
-# A thread local object used for binding the user currenting updating the model to the thread.
+# A thread local object used for binding the user currently updating the model to the thread.
+# The user's id is stored instead of the object to avoid issues with stale user objects.
+# An id of -1 is used to store an anonymous user.
 _thread_local = threading.local()
 
 
@@ -65,21 +67,28 @@ def set_local_user(user):
 
     :param user: user model
     """
-    _thread_local.user = user
+    _thread_local.user_id = -1 if user.is_anonymous() else user.id
 
 
 def get_local_user():
     """
     :return: The user for the local thread's request
     """
-    return _thread_local.user if hasattr(_thread_local, 'user') else None
+    user_id = _thread_local.user_id if hasattr(_thread_local, 'user_id') else None
+
+    if user_id == None:
+        return None
+    elif user_id == -1:
+        return AnonymousUser()
+    else:
+        return User.objects.filter(id=user_id).first()
 
 
 def clear_local_user():
     """
     Clear's the user from the current thread
     """
-    _thread_local.user = None
+    _thread_local.user_id = None
 
 
 class ModelChangeMixin(object):
