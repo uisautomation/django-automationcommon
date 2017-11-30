@@ -26,6 +26,7 @@ setup(
         'zeep',
         'django-hijack',
         'django-stronghold',
+        'beautifulsoup4',
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
