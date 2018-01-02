@@ -2,7 +2,11 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+# Import compatible with 1.9 and 2.0
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test import override_settings
 from mock import patch
