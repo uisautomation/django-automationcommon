@@ -69,7 +69,9 @@ def set_local_user(user):
 
     :param user: user model
     """
-    _thread_local.user_id = -1 if user.is_anonymous() else user.id
+    # workaround for is_anonymous being an attribute in Django >=1.10
+    is_anon = user.is_anonymous() if callable(user.is_anonymous) else user.is_anonymous
+    _thread_local.user_id = -1 if is_anon else user.id
 
 
 def get_local_user():
@@ -131,8 +133,10 @@ class ModelChangeMixin(object):
             request_user = get_local_user()
             for diff in self.diffs:
                 if request_user:
+                    # Workaround for is_anonymous becoming an attribute in Django >=1.10.
+                    is_anon = request_user.user.is_anonymous() if callable(request_user.is_anonymous) else request_user.is_anonymous
                     Audit.objects.create(
-                        who=None if request_user.is_anonymous() else request_user,
+                        who=None if is_anon else request_user,
                         model=self.__class__.__name__,
                         model_pk=self.pk,
                         field=diff[0],
@@ -152,10 +156,12 @@ class ModelChangeMixin(object):
         """
         request_user = get_local_user()
         if request_user:
+            # Workaround for is_anonymous becoming an attribute in Django >=1.10.
+            is_anon = request_user.user.is_anonymous() if callable(request_user.is_anonymous) else request_user.is_anonymous
             for field, value in self.__initial.items():
                 if field != 'id' and value:
                     Audit.objects.create(
-                        who=None if request_user.is_anonymous() else request_user,
+                        who=None if is_anon else request_user,
                         model=self.__class__.__name__,
                         model_pk=self.pk,
                         field=field, old=value,
