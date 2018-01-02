@@ -12,6 +12,8 @@ settings.configure(DEBUG=True,
                               'django.contrib.contenttypes',
                               'django.contrib.sessions',
                               'django.contrib.admin',
+                              'ucamlookup',
+                              'ucamwebauth',
                               'automationcommon',))
 
 # Django >= 1.8
