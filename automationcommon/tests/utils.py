@@ -2,7 +2,7 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.auth.models import User
-# Import compatible with 1.9 and 2.0
+# django.core.urlresolvers has been deprecated since 1.10 and removed in 2.0
 try:
     from django.urls import reverse
 except ImportError:
