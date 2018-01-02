@@ -21,7 +21,7 @@ class Creatable(models.Model):
     """
 
     # creator of the entity
-    creator = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="+")
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="+", on_delete="CASCADE")
     # when the entity was created
     creation_date = models.DateTimeField(auto_now_add=True)
 
@@ -44,7 +44,7 @@ class Audit(models.Model):
     """
     when = models.DateTimeField(auto_now=True)
 
-    who = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True)
+    who = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete="CASCADE")
 
     model = models.CharField(max_length=64)
 

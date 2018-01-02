@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('field', models.CharField(max_length=64)),
                 ('old', models.CharField(blank=True, max_length=255, null=True)),
                 ('new', models.CharField(blank=True, max_length=255, null=True)),
-                ('who', models.ForeignKey(blank=True, to=settings.AUTH_USER_MODEL, null=True)),
+                ('who', models.ForeignKey(blank=True, to=settings.AUTH_USER_MODEL, null=True, on_delete='CASCADE')),
             ],
         ),
     ]
