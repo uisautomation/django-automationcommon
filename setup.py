@@ -7,7 +7,7 @@ from setuptools import find_packages
 setup(
     name='django-automationcommon',
     # When changing this version number, remember to update CHANGELOG.
-    version='1.14',
+    version='1.15',
     packages=find_packages(),
     include_package_data=True,
     license='MIT',
