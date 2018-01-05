@@ -1,4 +1,5 @@
 import logging
+import os
 import requests
 from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
@@ -53,4 +54,9 @@ def status(request):
     if not overall_result:
         LOGGER.error("Status Webpage returning 500: %s" % status_results)
 
-    return render(request, 'status.html', {'status_results': status_results}, status=200 if overall_result else 500)
+    # Retrieve some context information from the environment if provided.
+    # Deployments can use this to indicate which commit is deployed, etc.
+    context_info = os.environ.get('AUTOMATION_WEBAPP_CONTEXT', '')
+
+    return render(request, 'status.html', {'context_info': context_info, 'status_results': status_results},
+                  status=200 if overall_result else 500)

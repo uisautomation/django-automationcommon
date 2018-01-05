@@ -43,6 +43,9 @@
         </div>
     </header>
     <section class="wrapper">
+        {% if context_info %}
+            <p class="context-info">{{ context_info }}</p>
+        {% endif %}
         {% for name, status in status_results.items %}
             <p class="status-{{ status }}">
                 {{ name }}
