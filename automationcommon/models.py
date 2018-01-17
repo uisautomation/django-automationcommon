@@ -1,15 +1,16 @@
 import logging
 import threading
+import django
 from distutils.version import StrictVersion
-
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.db import models
 from django.forms import model_to_dict
-from testfixtures import django
+
 
 LOGGER = logging.getLogger('automationcommon')
+
 
 LOCAL_USER_WARNING = """
     Use automationcommon.models.set_local_user() to set the user to be used in the audit trail or 
