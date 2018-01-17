@@ -1,11 +1,13 @@
 import logging
 import threading
+from distutils.version import StrictVersion
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.db import models
 from django.forms import model_to_dict
+from testfixtures import django
 
 LOGGER = logging.getLogger('automationcommon')
 
@@ -44,7 +46,9 @@ class Audit(models.Model):
     """
     when = models.DateTimeField(auto_now=True)
 
-    who = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete="CASCADE")
+    who = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete="CASCADE") \
+        if StrictVersion(django.get_version()) >= StrictVersion('2.0') else \
+        models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True)
 
     model = models.CharField(max_length=64)
 

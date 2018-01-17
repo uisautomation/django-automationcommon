@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
+from distutils.version import StrictVersion
+import django
 from django.db import migrations, models
 from django.conf import settings
 
@@ -22,7 +23,8 @@ class Migration(migrations.Migration):
                 ('field', models.CharField(max_length=64)),
                 ('old', models.CharField(blank=True, max_length=255, null=True)),
                 ('new', models.CharField(blank=True, max_length=255, null=True)),
-                ('who', models.ForeignKey(blank=True, to=settings.AUTH_USER_MODEL, null=True, on_delete='CASCADE')),
-            ],
+            ] + ([('who', models.ForeignKey(blank=True, to=settings.AUTH_USER_MODEL, null=True, on_delete='CASCADE'))]
+            if StrictVersion(django.get_version()) >= StrictVersion('2.0') else
+            [('who', models.ForeignKey(blank=True, to=settings.AUTH_USER_MODEL, null=True))])
         ),
     ]
