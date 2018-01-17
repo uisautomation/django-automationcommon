@@ -24,7 +24,9 @@ class Creatable(models.Model):
     """
 
     # creator of the entity
-    creator = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="+", on_delete="CASCADE")
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="+", on_delete="CASCADE") \
+        if StrictVersion(django.get_version()) >= StrictVersion('2.0') else \
+        models.ForeignKey(settings.AUTH_USER_MODEL, related_name="+")
     # when the entity was created
     creation_date = models.DateTimeField(auto_now_add=True)
 
