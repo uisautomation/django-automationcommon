@@ -27,6 +27,7 @@ setup(
         'django-hijack',
         'django-stronghold',
         'beautifulsoup4',
+        'mock',
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
