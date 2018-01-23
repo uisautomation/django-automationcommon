@@ -13,7 +13,7 @@ setup(
     license='MIT',
     description='Common functionality across different Django projects of the UofC UIS Automation team',
     long_description=open('README.rst').read(),
-    url='https://git.csx.cam.ac.uk/i/ucs/automation/django-automationcommon',
+    url='https://github.com/uisautomation/django-automationcommon.git',
     author='Automation team, University Information Services, University of Cambridge',
     author_email='automation@uis.cam.ac.uk',
     tests_require=['testfixtures'],
