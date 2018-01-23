@@ -1,0 +1,5 @@
+root=true
+
+[tox.ini]
+indent_style=space
+indent_size=4

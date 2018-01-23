@@ -10,3 +10,7 @@ venv/**
 dist/**
 django_automationcommon.egg-info/**
 
+# Tox output
+.coverage
+.tox/
+build/
