@@ -20,6 +20,7 @@ setup(
     install_requires=[
         'django>=1.8,<2.1',
         'django-ucamlookup>=1.9.2',
+        'django-ucamwebauth>=1.4.5',
         'requests',
         'celery<4',
         'python-dateutil',
