@@ -13,7 +13,7 @@ LOGGER = logging.getLogger('automationcommon')
 
 
 LOCAL_USER_WARNING = """
-    Use automationcommon.models.set_local_user() to set the user to be used in the audit trail or 
+    Use automationcommon.models.set_local_user() to set the user to be used in the audit trail or
     automationcommon.middleware.RequestUserMiddleware if you are in the context of a webapp.
 """
 
@@ -141,7 +141,7 @@ class ModelChangeMixin(object):
             for diff in self.diffs:
                 if request_user:
                     # Workaround for is_anonymous becoming an attribute in Django >=1.10.
-                    is_anon = request_user.user.is_anonymous() if callable(request_user.is_anonymous) else request_user.is_anonymous
+                    is_anon = request_user.is_anonymous() if callable(request_user.is_anonymous) else request_user.is_anonymous
                     Audit.objects.create(
                         who=None if is_anon else request_user,
                         model=self.__class__.__name__,
@@ -164,7 +164,7 @@ class ModelChangeMixin(object):
         request_user = get_local_user()
         if request_user:
             # Workaround for is_anonymous becoming an attribute in Django >=1.10.
-            is_anon = request_user.user.is_anonymous() if callable(request_user.is_anonymous) else request_user.is_anonymous
+            is_anon = request_user.is_anonymous() if callable(request_user.is_anonymous) else request_user.is_anonymous
             for field, value in self.__initial.items():
                 if field != 'id' and value:
                     Audit.objects.create(
