@@ -2,6 +2,13 @@
 Automation Common
 =================
 
+.. image:: https://travis-ci.org/uisautomation/django-automationcommon.svg?branch=master
+    :target: https://travis-ci.org/uisautomation/django-automationcommon
+
+.. image:: https://codecov.io/gh/uisautomation/django-automationcommon/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/uisautomation/django-automationcommon
+
+
 Automation Common is a simple Django app that provides common functionality across different Django projects of the UofC UIS Automation team.
 
 Quick start

@@ -176,13 +176,14 @@ def send(recipients, email_template, context, attachments=None, reply_to=None, b
     if bcc:
         kwargs['bcc'] = [settings.SERVER_EMAIL]
 
-    final_kwargs = {**{
+    final_kwargs = {
         'subject': subject_and_body[0],
         'body': subject_and_body[1],
         'from_email': settings.SERVER_EMAIL_FULL,
         'to': to,
         'headers': {'Return-Path': settings.SERVER_EMAIL}
-    }, **kwargs}
+    }
+    final_kwargs.update(kwargs)
 
     message = EmailMultiAlternatives(**final_kwargs)
 

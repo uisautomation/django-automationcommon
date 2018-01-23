@@ -1,0 +1,26 @@
+# The various combinations of python and Django we test with
+language: python
+python:
+  - "2.7"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+env:
+  - DJANGO_VER=1.8
+  - DJANGO_VER=1.11
+  - DJANGO_VER=2.0
+matrix:
+  exclude:
+    - python: "2.7"
+      env: DJANGO_VER=2.0
+    - python: "3.6"
+      env: DJANGO_VER=1.8
+
+install:
+  - pip install tox codecov
+# Test with "system" python and specified Django version
+script:
+  - tox -e py-django${DJANGO_VER}
+after_success:
+  - codecov
+

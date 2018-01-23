@@ -1,5 +1,6 @@
 import datetime
 import logging
+import mock
 
 from django.contrib.auth.models import User, AnonymousUser
 from testfixtures import LogCapture
@@ -36,7 +37,9 @@ class ModelsTests(UnitTestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.user = User.objects.create(username="it123")
+        with mock.patch('ucamlookup.utils.PersonMethods') as mocked_pm:
+            mocked_pm.return_value.getPerson.return_value = None
+            cls.user = User.objects.create(username="it123")
 
     def setUp(self):
         set_local_user(self.user)
