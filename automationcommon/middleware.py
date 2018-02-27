@@ -9,9 +9,10 @@ class RequestUserMiddleware(object):
         self.get_response = get_response
 
     def __call__(self, request):
-        response = self.get_response(self.process_request(request))
+        self.process_request(request)
+        response = self.get_response(request)
         return self.process_response(request, response)
-    
+
     @classmethod
     def process_request(cls, request):
         set_local_user(request.user)
