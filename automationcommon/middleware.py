@@ -5,10 +5,13 @@ class RequestUserMiddleware(object):
     """
     Middleware that simply set's the request.user to be used for the audit trail.
     """
-    def __init__(self, get_response):
+    def __init__(self, get_response=None):
         self.get_response = get_response
 
     def __call__(self, request):
+        # If we're being called as a new-style middleware then get_response
+        # should have been passed to us in __init__.
+        assert self.get_response is not None
         self.process_request(request)
         response = self.get_response(request)
         return self.process_response(request, response)

@@ -42,7 +42,7 @@ class Audit(models.Model):
         when      when the change was made
         who       who made the change (if null, then the user was anomymous)
         model     the changed model name
-        model_pk  the changed model primary key
+        model_pk  the repr() of the changed model primary key
         field     the changed model's field
         old       the changed field's original value
         new       the changed field's updated value
@@ -55,7 +55,7 @@ class Audit(models.Model):
 
     model = models.CharField(max_length=64)
 
-    model_pk = models.IntegerField()
+    model_pk = models.CharField(max_length=255)
 
     field = models.CharField(max_length=64)
 
@@ -145,7 +145,7 @@ class ModelChangeMixin(object):
                     Audit.objects.create(
                         who=None if is_anon else request_user,
                         model=self.__class__.__name__,
-                        model_pk=self.pk,
+                        model_pk=repr(self.pk),
                         field=diff[0],
                         old=diff[1][0], new=diff[1][1]
                     )
@@ -170,7 +170,7 @@ class ModelChangeMixin(object):
                     Audit.objects.create(
                         who=None if is_anon else request_user,
                         model=self.__class__.__name__,
-                        model_pk=self.pk,
+                        model_pk=repr(self.pk),
                         field=field, old=value,
                     )
         else:

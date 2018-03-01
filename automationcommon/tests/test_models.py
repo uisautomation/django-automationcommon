@@ -79,7 +79,7 @@ class ModelsTests(UnitTestCase):
         self.assertLessEqual(start, audit.when)
         self.assertEqual(self.user, audit.who)
         self.assertEqual('TestModel', audit.model)
-        self.assertEqual(1, audit.model_pk)
+        self.assertEqual('1', audit.model_pk)
         self.assertEqual('description', audit.field)
         self.assertEqual("it's round", audit.old)
         self.assertEqual("it's a round window", audit.new)
