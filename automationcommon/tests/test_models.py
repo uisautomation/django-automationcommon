@@ -23,6 +23,7 @@ class TestModel(ModelChangeMixin, FakeModel):
 
     def __init__(self, *args, **kwargs):
         self.fields = {
+            'id': 1,
             'name': 'the round window',
             'description': "it's round",
         }
@@ -100,6 +101,7 @@ class ModelsTests(UnitTestCase):
 
         # test
         self.test_model.fields = {
+            'id': 1,
             'name': 'the square window',
             'description': "no wait, it's actually square!",
         }
@@ -121,14 +123,17 @@ class ModelsTests(UnitTestCase):
         self.test_model.delete()
 
         # check
-        self.assertEqual(2, Audit.objects.count())
+        self.assertEqual(3, Audit.objects.count())
         audits = Audit.objects.all().order_by('field')
         self.assertEqual('description', audits[0].field)
         self.assertEqual("it's round", audits[0].old)
         self.assertIsNone(audits[0].new)
-        self.assertEqual('name', audits[1].field)
-        self.assertEqual("the round window", audits[1].old)
+        self.assertEqual('id', audits[1].field)
+        self.assertEqual("1", audits[1].old)
         self.assertIsNone(audits[1].new)
+        self.assertEqual('name', audits[2].field)
+        self.assertEqual("the round window", audits[2].old)
+        self.assertIsNone(audits[2].new)
 
     def tearDown(self):
         clear_local_user()

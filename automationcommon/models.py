@@ -166,7 +166,7 @@ class ModelChangeMixin(object):
             # Workaround for is_anonymous becoming an attribute in Django >=1.10.
             is_anon = request_user.is_anonymous() if callable(request_user.is_anonymous) else request_user.is_anonymous
             for field, value in self.__initial.items():
-                if field != 'id' and value:
+                if value:
                     Audit.objects.create(
                         who=None if is_anon else request_user,
                         model=self.__class__.__name__,
