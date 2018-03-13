@@ -6,12 +6,13 @@ from setuptools import find_packages
 
 setup(
     name='django-automationcommon',
-    # When changing this version number, remember to update CHANGELOG.
-    version='1.17',
+    version='1.18',
     packages=find_packages(),
     include_package_data=True,
     license='MIT',
-    description='Common functionality across different Django projects of the UofC UIS Automation team',
+    description=(
+        'Common functionality across different Django projects of the UofC UIS Automation team'
+    ),
     long_description=open('README.rst').read(),
     url='https://github.com/uisautomation/django-automationcommon.git',
     author='Automation team, University Information Services, University of Cambridge',
