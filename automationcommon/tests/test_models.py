@@ -122,13 +122,10 @@ class ModelsTests(UnitTestCase):
     def test_audit_multiple_change(self):
 
         # test
-        self.test_model._meta.fields = {
-            **self.test_model._meta.fields,
-            **{
-                'name': 'the square window',
-                'description': "no wait, it's actually square!",
-            }
-        }
+        self.test_model._meta.fields.update({
+            'name': 'the square window',
+            'description': "no wait, it's actually square!",
+        })
         self.test_model.save()
 
         # check
