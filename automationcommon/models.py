@@ -87,7 +87,7 @@ def get_local_user():
     """
     user_id = _thread_local.user_id if hasattr(_thread_local, 'user_id') else None
 
-    if user_id == None:
+    if user_id is None:
         return None
     elif user_id == -1:
         return AnonymousUser()
@@ -120,6 +120,18 @@ class ModelChangeMixin(object):
         # NOTE: an internal attribute has been used when introspecting the model.
         return model_to_dict(self, fields=[field.name for field in self._meta.fields])
 
+    def audit_compare(self, field, old, new):
+        """
+        This method is called to test for auditable difference when a model is saved.
+        Can be overridden for specific models for greater control over what changes are audited.
+
+        :param field: The field being compared
+        :param old: the original value
+        :param new: the updated value
+        :return: whether or not a change has been detected
+        """
+        return old != new
+
     @property
     def diffs(self):
         """
@@ -127,13 +139,16 @@ class ModelChangeMixin(object):
         """
         d1 = self.__initial
         d2 = self._dict
-        return [(k, (v, d2[k])) for k, v in d1.items() if v != d2[k]]
+        return [
+            (k, (v, d2[k])) for k, v in d1.items()
+            if self.audit_compare(self._meta.get_field(k), v, d2[k])
+        ]
 
     def save(self, *args, **kwargs):
         """
         Saves model, created an Audit record per changed field, and resets the initial state.
         """
-        creating = self.pk is None
+        creating = self._state.adding
         super(ModelChangeMixin, self).save(*args, **kwargs)
         # Don't audit new records
         if not creating:

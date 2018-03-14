@@ -43,3 +43,7 @@ testfixtures
         'automationcommon.middleware.RequestUserMiddleware',
         ...
     )
+
+    If you wish to customise how the mixin decides what to audit you can override your model's
+    audit_compare() method (see the method's comment for more details).
+

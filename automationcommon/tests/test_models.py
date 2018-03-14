@@ -1,11 +1,14 @@
 import datetime
 import logging
+
 import mock
 
 from django.contrib.auth.models import User, AnonymousUser
 from testfixtures import LogCapture
 
-from automationcommon.models import set_local_user, Audit, ModelChangeMixin, clear_local_user, LOCAL_USER_WARNING
+from automationcommon.models import (
+    set_local_user, Audit, ModelChangeMixin, clear_local_user, LOCAL_USER_WARNING
+)
 from automationcommon.tests.utils import UnitTestCase
 
 
@@ -19,19 +22,38 @@ class FakeModel:
         pass
 
 
-class TestModel(ModelChangeMixin, FakeModel):
-
-    def __init__(self, *args, **kwargs):
+class FakeMeta:
+    def __init__(self):
         self.fields = {
             'id': 1,
             'name': 'the round window',
             'description': "it's round",
+            'other': True
         }
+
+    def get_field(self, name):
+        return self.fields[name]
+
+
+class FakeState:
+    adding = False
+
+
+class TestModel(ModelChangeMixin, FakeModel):
+
+    def __init__(self, *args, **kwargs):
+        self._meta = FakeMeta()
+        self._state = FakeState()
         super(TestModel, self).__init__(*args, **kwargs)
 
     @property
     def _dict(self):
-        return self.fields.copy()
+        return self._meta.fields.copy()
+
+    def audit_compare(self, field, old, new):
+        if isinstance(field, bool):
+            return False
+        return super(TestModel, self).audit_compare(field, old, new)
 
 
 class ModelsTests(UnitTestCase):
@@ -53,7 +75,7 @@ class ModelsTests(UnitTestCase):
         with LogCapture(level=logging.INFO) as log_capture:
 
             # test
-            self.test_model.fields.update({'description': "it's a round window"})
+            self.test_model._meta.fields.update({'description': "it's a round window"})
             self.test_model.save()
 
             # check
@@ -71,7 +93,7 @@ class ModelsTests(UnitTestCase):
         start = datetime.datetime.now()
 
         # test
-        self.test_model.fields.update({'description': "it's a round window"})
+        self.test_model._meta.fields.update({'description': "it's a round window"})
         self.test_model.save()
 
         # check
@@ -90,7 +112,7 @@ class ModelsTests(UnitTestCase):
         set_local_user(AnonymousUser())
 
         # test
-        self.test_model.fields.update({'description': "it's a round window"})
+        self.test_model._meta.fields.update({'description': "it's a round window"})
         self.test_model.save()
 
         # check
@@ -100,11 +122,10 @@ class ModelsTests(UnitTestCase):
     def test_audit_multiple_change(self):
 
         # test
-        self.test_model.fields = {
-            'id': 1,
+        self.test_model._meta.fields.update({
             'name': 'the square window',
             'description': "no wait, it's actually square!",
-        }
+        })
         self.test_model.save()
 
         # check
@@ -123,7 +144,7 @@ class ModelsTests(UnitTestCase):
         self.test_model.delete()
 
         # check
-        self.assertEqual(3, Audit.objects.count())
+        self.assertEqual(4, Audit.objects.count())
         audits = Audit.objects.all().order_by('field')
         self.assertEqual('description', audits[0].field)
         self.assertEqual("it's round", audits[0].old)
@@ -134,6 +155,20 @@ class ModelsTests(UnitTestCase):
         self.assertEqual('name', audits[2].field)
         self.assertEqual("the round window", audits[2].old)
         self.assertIsNone(audits[2].new)
+        self.assertEqual('other', audits[3].field)
+        self.assertTrue(audits[3].old)
+        self.assertIsNone(audits[3].new)
+
+
+    def test_audit_compare_override(self):
+        """check that any changes to the 'other' field are ignored because of audit_compare()"""
+
+        # test
+        self.test_model._meta.fields.update({'other': False})
+        self.test_model.save()
+
+        # check
+        self.assertEqual(0, Audit.objects.count())
 
     def tearDown(self):
         clear_local_user()
