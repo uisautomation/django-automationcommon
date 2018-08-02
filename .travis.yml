@@ -9,12 +9,17 @@ env:
   - DJANGO_VER=1.8
   - DJANGO_VER=1.11
   - DJANGO_VER=2.0
+  - DJANGO_VER=2.1
 matrix:
   exclude:
     - python: "2.7"
       env: DJANGO_VER=2.0
+    - python: "2.7"
+      env: DJANGO_VER=2.1
     - python: "3.6"
       env: DJANGO_VER=1.8
+    - python: "3.4"
+      env: DJANGO_VER=2.1
 
 install:
   - pip install tox codecov

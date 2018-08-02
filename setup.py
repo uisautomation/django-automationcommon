@@ -18,7 +18,7 @@ setup(
     author_email='automation@uis.cam.ac.uk',
     tests_require=['testfixtures'],
     install_requires=[
-        'django>=1.8,<2.1',
+        'django>=1.8,<2.2',
         'django-ucamlookup>=1.9.2',
         'django-ucamwebauth>=1.4.5',
         'requests',
