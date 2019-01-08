@@ -6,7 +6,7 @@ from setuptools import find_packages
 
 setup(
     name='django-automationcommon',
-    version='1.18',
+    version='1.19',
     packages=find_packages(),
     include_package_data=True,
     license='MIT',
@@ -16,11 +16,11 @@ setup(
     long_description=open('README.rst').read(),
     url='https://github.com/uisautomation/django-automationcommon.git',
     author='Automation team, University Information Services, University of Cambridge',
-    author_email='automation@uis.cam.ac.uk',
+    author_email='devops@uis.cam.ac.uk',
     tests_require=['testfixtures'],
     install_requires=[
         'django>=1.8,<2.2',
-        'django-ucamlookup>=1.9.2',
+        'django-ucamlookup>=1.9.5',
         'django-ucamwebauth>=1.4.5',
         'requests',
         'celery<4',
