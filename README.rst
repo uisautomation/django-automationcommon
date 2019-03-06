@@ -2,6 +2,8 @@
 Automation Common
 =================
 
+**This repository has moved to https://gitlab.developers.cam.ac.uk/uis/devops/django/automationcommon**
+
 .. image:: https://travis-ci.org/uisautomation/django-automationcommon.svg?branch=master
     :target: https://travis-ci.org/uisautomation/django-automationcommon
 
